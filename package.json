@@ -1,9 +1,9 @@
 {
-  "name": "your-project-name",
+  "name": "les-arcs-tracking",
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://yourusername.github.io/your-repo-name",
+  "homepage": "https://audreyhs.github.io/les-arcs-tracking",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -21,7 +21,7 @@
     "@types/react-dom": "^18.x.x",
     "@vitejs/plugin-react": "^4.x.x",
     "autoprefixer": "^10.x.x",
-    "gh-pages": "^6.x.x",
+    "gh-pages": "^6.3.0",
     "postcss": "^8.x.x",
     "tailwindcss": "^3.x.x",
     "vite": "^5.x.x"
