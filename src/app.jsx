@@ -11,7 +11,7 @@ const VALID_CODES = {
   '512': 'user', '569': 'user', '603': 'user', '647': 'user',
   '682': 'user', '715': 'user', '743': 'user', '789': 'user',
   '812': 'user', '856': 'user', '891': 'user', '923': 'user',
-  '945': 'user', '967': 'user', '978': 'user', '994': 'user',
+  '945': 'user', '967': 'user', '978': 'user', '999': 'user',
   '793': 'admin'
 };
 
