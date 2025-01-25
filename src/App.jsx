@@ -19,7 +19,7 @@ const VALID_CODES = {
 };
 
 // List of participants
-const PARTICIPANTS = Array.from({length: 20}, (_, i) => `Person ${i + 1}`);
+const PARTICIPANTS = ['Craig', 'Immie', 'Jake', 'Brian', 'Reah', 'Josh', 'Archie', 'David', 'Audrey', 'James', 'Abe', 'Connor', 'Lucy', 'Becky', 'Tom', 'Freddie'];
 
 // List of tracking categories
 const CATEGORIES = [
