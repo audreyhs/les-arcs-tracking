@@ -17,7 +17,7 @@ const VALID_CODES = {
 
 const PARTICIPANTS = ['Craig', 'Immie', 'Jake', 'Brian', 'Reah', 'Josh', 'Archie', 'David', 'Audrey', 'James', 'Abe', 'Connor', 'Lucy', 'Becky', 'Tom', 'Freddie'];
 
-// Initial categories moved to state to allow updates
+// Initial categories moved to state to allow updates? TEST
 const INITIAL_CATEGORIES = [
   'TC', 'NTC', 'yardsale', 'lost ≥1 shoe', 'missed lesson',
   'chops', 'missed boarding', 'cuppa', 'animal incident',
