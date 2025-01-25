@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
-// Initialize Supabase client
-
 const supabase = createClient(
-	import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_URL,
   import.meta.env.VITE_SUPABASE_ANON_KEY
 );
 
-// List of valid access codes
 const VALID_CODES = {
   '127': 'user', '256': 'user', '394': 'user', '438': 'user',
   '512': 'user', '569': 'user', '603': 'user', '647': 'user',
@@ -18,11 +15,10 @@ const VALID_CODES = {
   '793': 'admin'
 };
 
-// List of participants
 const PARTICIPANTS = ['Craig', 'Immie', 'Jake', 'Brian', 'Reah', 'Josh', 'Archie', 'David', 'Audrey', 'James', 'Abe', 'Connor', 'Lucy', 'Becky', 'Tom', 'Freddie'];
 
-// List of tracking categories
-const CATEGORIES = [
+// Initial categories moved to state to allow updates
+const INITIAL_CATEGORIES = [
   'TC', 'NTC', 'yardsale', 'lost ≥1 shoe', 'missed lesson',
   'chops', 'missed boarding', 'cuppa', 'animal incident',
   'investment', 'knocks over another individual'
@@ -36,26 +32,59 @@ function App() {
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [showSubmitMessage, setShowSubmitMessage] = useState(false);
   const [records, setRecords] = useState([]);
+  const [categories, setCategories] = useState(INITIAL_CATEGORIES);
+  const [newCategory, setNewCategory] = useState('');
 
-  // Fetch records for admin view
   useEffect(() => {
-    const fetchRecords = async () => {
+    const fetchData = async () => {
       if (userType !== 'admin') return;
 
-      const { data, error } = await supabase
+      // Fetch records
+      const { data: recordsData, error: recordsError } = await supabase
         .from('tracking_records')
         .select('*');
 
-      if (error) {
-        console.error('Error fetching records:', error);
+      if (recordsError) {
+        console.error('Error fetching records:', recordsError);
         return;
       }
+      setRecords(recordsData || []);
 
-      setRecords(data || []);
+      // Fetch categories
+      const { data: categoriesData, error: categoriesError } = await supabase
+        .from('categories')
+        .select('name');
+
+      if (categoriesError) {
+        console.error('Error fetching categories:', categoriesError);
+        return;
+      }
+      
+      if (categoriesData && categoriesData.length > 0) {
+        setCategories(categoriesData.map(c => c.name));
+      }
     };
 
-    fetchRecords();
+    fetchData();
   }, [userType]);
+
+  const handleAddCategory = async () => {
+    if (!newCategory.trim()) return;
+    
+    try {
+      const { error } = await supabase
+        .from('categories')
+        .insert([{ name: newCategory.trim() }]);
+
+      if (error) throw error;
+
+      setCategories([...categories, newCategory.trim()]);
+      setNewCategory('');
+    } catch (error) {
+      alert('Failed to add category');
+      console.error('Error adding category:', error);
+    }
+  };
 
   const handleLogin = () => {
     const userRole = VALID_CODES[accessCode];
@@ -76,20 +105,17 @@ function App() {
       return;
     }
 
-    const newRecord = {
-      person: selectedPerson,
-      category: selectedCategory,
-      access_code: accessCode
-    };
-
     try {
       const { error } = await supabase
         .from('tracking_records')
-        .insert([newRecord]);
+        .insert([{
+          person: selectedPerson,
+          category: selectedCategory,
+          access_code: accessCode
+        }]);
 
       if (error) throw error;
 
-      // Reset form
       setSelectedPerson('');
       setSelectedCategory('');
       setIsConfirmed(false);
@@ -104,7 +130,6 @@ function App() {
     }
   };
 
-  // Login screen
   if (!userType) {
     return (
       <div className="p-6">
@@ -129,7 +154,6 @@ function App() {
     );
   }
 
-  // User view - just the form
   if (userType === 'user') {
     return (
       <div className="p-6">
@@ -153,7 +177,7 @@ function App() {
             className="w-full p-2 border rounded"
           >
             <option value="">Select Category</option>
-            {CATEGORIES.map(category => (
+            {categories.map(category => (
               <option key={category} value={category}>{category}</option>
             ))}
           </select>
@@ -185,10 +209,28 @@ function App() {
     );
   }
 
-  // Admin view - shows the stats table
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">Les Arcs Tracking - Admin View</h1>
+      
+      <div className="mb-8">
+        <h2 className="text-xl font-bold mb-4">Add New Category</h2>
+        <div className="flex gap-2 max-w-sm">
+          <input
+            type="text"
+            value={newCategory}
+            onChange={(e) => setNewCategory(e.target.value)}
+            placeholder="Enter new category"
+            className="flex-1 p-2 border rounded"
+          />
+          <button
+            onClick={handleAddCategory}
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >
+            Add
+          </button>
+        </div>
+      </div>
       
       <div className="overflow-x-auto">
         <table className="min-w-full border-collapse border border-gray-300">
@@ -196,7 +238,7 @@ function App() {
             <tr>
               <th className="border border-gray-300 p-2">Person</th>
               <th className="border border-gray-300 p-2">Total</th>
-              {CATEGORIES.map(category => (
+              {categories.map(category => (
                 <th key={category} className="border border-gray-300 p-2">{category}</th>
               ))}
             </tr>
@@ -204,7 +246,7 @@ function App() {
           <tbody>
             {PARTICIPANTS.map(person => {
               const personRecords = records.filter(r => r.person === person);
-              const stats = CATEGORIES.reduce((acc, category) => ({
+              const stats = categories.reduce((acc, category) => ({
                 ...acc,
                 [category]: personRecords.filter(r => r.category === category).length
               }), {});
@@ -213,7 +255,7 @@ function App() {
                 <tr key={person}>
                   <td className="border border-gray-300 p-2">{person}</td>
                   <td className="border border-gray-300 p-2">{personRecords.length}</td>
-                  {CATEGORIES.map(category => (
+                  {categories.map(category => (
                     <td key={category} className="border border-gray-300 p-2">
                       {stats[category] || 0}
                     </td>
