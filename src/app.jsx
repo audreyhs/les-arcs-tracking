@@ -74,22 +74,31 @@ function App() {
   }, [userType]);
 
   const handleAddCategory = async () => {
-    if (!newCategory.trim()) return;
-    
-    try {
-      const { error } = await supabase
-        .from('categories')
-        .insert([{ name: newCategory.trim() }]);
+  if (!newCategory.trim()) return;
+  
+  try {
+    const { data, error } = await supabase
+      .from('categories')
+      .insert([{ name: newCategory.trim() }])
+      .select();
 
-      if (error) throw error;
-
-      setCategories([...categories, newCategory.trim()]);
-      setNewCategory('');
-    } catch (error) {
-      alert('Failed to add category');
-      console.error('Error adding category:', error);
+    if (error) {
+      console.error('Supabase Error Details:', {
+        message: error.message,
+        details: error.details,
+        code: error.code
+      });
+      alert(`Failed to add category: ${error.message}`);
+      return;
     }
-  };
+
+    setCategories([...categories, newCategory.trim()]);
+    setNewCategory('');
+  } catch (error) {
+    console.error('Unexpected error adding category:', error);
+    alert('Unexpected error adding category');
+  }
+};
 
   const handleLogin = () => {
     const userRole = VALID_CODES[accessCode];
