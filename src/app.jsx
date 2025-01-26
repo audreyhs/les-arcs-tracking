@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
+import FetchNames from "./components/FetchNames";
+import { supabase } from "./supabaseClient";
+import TextBox from './components/textbox.jsx';
 
 const VALID_CODES = {
   '127': 'user', '256': 'user', '394': 'user', '438': 'user',
@@ -33,6 +30,7 @@ function App() {
   const [records, setRecords] = useState([]);
   const [categories, setCategories] = useState(INITIAL_CATEGORIES);
   const [newCategory, setNewCategory] = useState('');
+  const [comment, setNewComment] = useState('');
 
   useEffect(() => {
     supabase.auth.onAuthStateChange((event, session) => {
@@ -125,7 +123,8 @@ function App() {
         .insert([{
           person: selectedPerson,
           category: selectedCategory,
-          access_code: accessCode
+          access_code: accessCode,
+          comments: comment
         }]);
 
       if (error) throw error;
@@ -185,16 +184,10 @@ function App() {
             ))}
           </select>
 
-          <select 
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="w-full p-2 border rounded"
-          >
-            <option value="">Select Category</option>
-            {categories.map(category => (
-              <option key={category} value={category}>{category}</option>
-            ))}
-          </select>
+          <div>
+          <FetchNames setSelectedCategory={setSelectedCategory} />
+          <TextBox setNewComment={setNewComment}/>
+          </div>
 
           <div className="flex items-center justify-center gap-2">
             <input 
