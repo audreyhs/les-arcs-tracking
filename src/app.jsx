@@ -17,7 +17,6 @@ const VALID_CODES = {
 
 const PARTICIPANTS = ['Craig', 'Immie', 'Jake', 'Brian', 'Reah', 'Josh', 'Archie', 'David', 'Audrey', 'James', 'Abe', 'Connor', 'Lucy', 'Becky', 'Tom', 'Freddie'];
 
-// Initial categories moved to state to allow updates? TEST
 const INITIAL_CATEGORIES = [
   'TC', 'NTC', 'yardsale', 'lost ≥1 shoe', 'missed lesson',
   'chops', 'missed boarding', 'cuppa', 'animal incident',
@@ -36,10 +35,17 @@ function App() {
   const [newCategory, setNewCategory] = useState('');
 
   useEffect(() => {
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (session) {
+        supabase.rpc('set_request_access_code', { code: accessCode });
+      }
+    });
+  }, [accessCode]);
+
+  useEffect(() => {
     const fetchData = async () => {
       if (userType !== 'admin') return;
 
-      // Fetch records
       const { data: recordsData, error: recordsError } = await supabase
         .from('tracking_records')
         .select('*');
@@ -50,7 +56,6 @@ function App() {
       }
       setRecords(recordsData || []);
 
-      // Fetch categories
       const { data: categoriesData, error: categoriesError } = await supabase
         .from('categories')
         .select('name');
