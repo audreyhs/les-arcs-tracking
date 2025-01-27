@@ -1,26 +1,21 @@
-import React, { useState } from "react";
+import React from "react";
 import "./textbox.css";
 
-const TextBox = ({ setNewComment }) => {
-  const [text, setText] = useState("");
-
-  const handleChange = (e) => {
-    setText(e.target.value);
-    setNewComment(e.target.value);
-  };
-
+const TextBox = ({ comment, setNewComment }) => {
   return (
     <div className="textbox-container">
       <label htmlFor="textbox" className="textbox-label">
         Comment:
       </label>
-      <textarea type="text"
+      <input
+        type="text"
         id="textbox"
-        value={text}
-        onChange={handleChange}
-        placeholder="Type here..."
+        value={comment}
+        onChange={(e) => setNewComment(e.target.value)}
+        placeholder="Tell us the story (if you want)."
         className="textbox-input"
       />
+      <p className="textbox-preview">Comment: {comment}</p>
     </div>
   );
 };

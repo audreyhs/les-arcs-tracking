@@ -133,6 +133,13 @@ function App() {
       setSelectedCategory('');
       setIsConfirmed(false);
       setShowSubmitMessage(true);
+
+         // Reset all fields
+    setSelectedPerson('');
+    setSelectedCategory('');
+    setNewComment('');  // Add this line
+    setIsConfirmed(false);
+    setShowSubmitMessage(true);
       
       setTimeout(() => {
         setShowSubmitMessage(false);
@@ -185,8 +192,8 @@ function App() {
           </select>
 
           <div>
-          <FetchNames setSelectedCategory={setSelectedCategory} />
-          <TextBox setNewComment={setNewComment}/>
+          <FetchNames selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} />
+          <TextBox comment={comment} setNewComment={setNewComment}/>
           </div>
 
           <div className="flex items-center justify-center gap-2">
